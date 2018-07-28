@@ -493,6 +493,30 @@ public class MetadataManager
     }
 
     @Override
+    public void createModel(Session session, String catalogName, String modelName) {
+        CatalogMetadata catalogMetadata = getCatalogMetadataForWrite(session, catalogName);
+        ConnectorId connectorId = catalogMetadata.getConnectorId();
+        ConnectorMetadata metadata = catalogMetadata.getMetadata();
+        metadata.createModel(session.toConnectorSession(connectorId), modelName);
+    }
+
+    @Override
+    public List<String> listModels(Session session, String catalogName) {
+        CatalogMetadata catalogMetadata = getCatalogMetadataForWrite(session, catalogName);
+        ConnectorId connectorId = catalogMetadata.getConnectorId();
+        ConnectorMetadata metadata = catalogMetadata.getMetadata();
+        return metadata.listModels(session.toConnectorSession(connectorId));
+    }
+
+    @Override
+    public void deleteModel(Session session, String catalogName, String modelName) {
+        CatalogMetadata catalogMetadata = getCatalogMetadataForWrite(session, catalogName);
+        ConnectorId connectorId = catalogMetadata.getConnectorId();
+        ConnectorMetadata metadata = catalogMetadata.getMetadata();
+        metadata.deleteModel(session.toConnectorSession(connectorId), modelName);
+    }
+
+    @Override
     public void dropSchema(Session session, CatalogSchemaName schema)
     {
         CatalogMetadata catalogMetadata = getCatalogMetadataForWrite(session, schema.getCatalogName());
@@ -915,6 +939,7 @@ public class MetadataManager
     {
         return columnPropertyManager;
     }
+
 
     private ViewDefinition deserializeView(String data)
     {

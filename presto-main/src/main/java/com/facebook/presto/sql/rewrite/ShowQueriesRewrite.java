@@ -33,39 +33,7 @@ import com.facebook.presto.sql.analyzer.QueryExplainer;
 import com.facebook.presto.sql.analyzer.SemanticException;
 import com.facebook.presto.sql.parser.ParsingException;
 import com.facebook.presto.sql.parser.SqlParser;
-import com.facebook.presto.sql.tree.AllColumns;
-import com.facebook.presto.sql.tree.ArrayConstructor;
-import com.facebook.presto.sql.tree.AstVisitor;
-import com.facebook.presto.sql.tree.BooleanLiteral;
-import com.facebook.presto.sql.tree.ColumnDefinition;
-import com.facebook.presto.sql.tree.CreateTable;
-import com.facebook.presto.sql.tree.CreateView;
-import com.facebook.presto.sql.tree.DoubleLiteral;
-import com.facebook.presto.sql.tree.Explain;
-import com.facebook.presto.sql.tree.Expression;
-import com.facebook.presto.sql.tree.Identifier;
-import com.facebook.presto.sql.tree.LikePredicate;
-import com.facebook.presto.sql.tree.LongLiteral;
-import com.facebook.presto.sql.tree.Node;
-import com.facebook.presto.sql.tree.OrderBy;
-import com.facebook.presto.sql.tree.Property;
-import com.facebook.presto.sql.tree.QualifiedName;
-import com.facebook.presto.sql.tree.Query;
-import com.facebook.presto.sql.tree.Relation;
-import com.facebook.presto.sql.tree.ShowCatalogs;
-import com.facebook.presto.sql.tree.ShowColumns;
-import com.facebook.presto.sql.tree.ShowCreate;
-import com.facebook.presto.sql.tree.ShowFunctions;
-import com.facebook.presto.sql.tree.ShowGrants;
-import com.facebook.presto.sql.tree.ShowPartitions;
-import com.facebook.presto.sql.tree.ShowSchemas;
-import com.facebook.presto.sql.tree.ShowSession;
-import com.facebook.presto.sql.tree.ShowTables;
-import com.facebook.presto.sql.tree.SortItem;
-import com.facebook.presto.sql.tree.Statement;
-import com.facebook.presto.sql.tree.StringLiteral;
-import com.facebook.presto.sql.tree.TableElement;
-import com.facebook.presto.sql.tree.Values;
+import com.facebook.presto.sql.tree.*;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -80,10 +48,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 
-import static com.facebook.presto.connector.informationSchema.InformationSchemaMetadata.TABLE_COLUMNS;
-import static com.facebook.presto.connector.informationSchema.InformationSchemaMetadata.TABLE_SCHEMATA;
-import static com.facebook.presto.connector.informationSchema.InformationSchemaMetadata.TABLE_TABLES;
-import static com.facebook.presto.connector.informationSchema.InformationSchemaMetadata.TABLE_TABLE_PRIVILEGES;
+import static com.facebook.presto.connector.informationSchema.InformationSchemaMetadata.*;
 import static com.facebook.presto.metadata.MetadataListing.listCatalogs;
 import static com.facebook.presto.metadata.MetadataListing.listSchemas;
 import static com.facebook.presto.metadata.MetadataUtil.createCatalogSchemaName;
@@ -277,6 +242,21 @@ final class ShowQueriesRewrite
                     from(catalog, TABLE_SCHEMATA),
                     predicate,
                     Optional.of(ordering(ascending("schema_name"))));
+        }
+
+        @Override
+        protected Node visitShowModels(ShowModels node, Void context) {
+            if (!node.getCatalog().isPresent() && !session.getCatalog().isPresent()) {
+                throw new SemanticException(CATALOG_NOT_SPECIFIED, node, "Catalog must be specified when session catalog is not set");
+            }
+
+            String catalog = node.getCatalog().map(Identifier::getValue).orElseGet(() -> session.getCatalog().get());
+
+            return simpleQuery(
+                    selectList(aliasedName("model_name", "Model")),
+                    from(catalog, TABLE_MODEL),
+                    Optional.empty(),
+                    Optional.of(ordering(ascending("model_name"))));
         }
 
         @Override

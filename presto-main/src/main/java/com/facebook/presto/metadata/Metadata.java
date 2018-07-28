@@ -113,6 +113,13 @@ public interface Metadata
      */
     void createSchema(Session session, CatalogSchemaName schema, Map<String, Object> properties);
 
+
+    /**
+     * Create a Model
+     */
+    void createModel(Session session, String catalogName, String modelName);
+
+    
     /**
      * Drops the specified schema.
      */
@@ -291,4 +298,8 @@ public interface Metadata
     TablePropertyManager getTablePropertyManager();
 
     ColumnPropertyManager getColumnPropertyManager();
+
+    List<String> listModels(Session session, String catalogName);
+
+    void deleteModel(Session session, String catalogName, String modelName);
 }

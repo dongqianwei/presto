@@ -14,47 +14,7 @@
 package com.facebook.presto.util;
 
 import com.facebook.presto.spi.resourceGroups.QueryType;
-import com.facebook.presto.sql.tree.AddColumn;
-import com.facebook.presto.sql.tree.Call;
-import com.facebook.presto.sql.tree.Commit;
-import com.facebook.presto.sql.tree.CreateSchema;
-import com.facebook.presto.sql.tree.CreateTable;
-import com.facebook.presto.sql.tree.CreateTableAsSelect;
-import com.facebook.presto.sql.tree.CreateView;
-import com.facebook.presto.sql.tree.Deallocate;
-import com.facebook.presto.sql.tree.Delete;
-import com.facebook.presto.sql.tree.DescribeInput;
-import com.facebook.presto.sql.tree.DescribeOutput;
-import com.facebook.presto.sql.tree.DropColumn;
-import com.facebook.presto.sql.tree.DropSchema;
-import com.facebook.presto.sql.tree.DropTable;
-import com.facebook.presto.sql.tree.DropView;
-import com.facebook.presto.sql.tree.Explain;
-import com.facebook.presto.sql.tree.Grant;
-import com.facebook.presto.sql.tree.Insert;
-import com.facebook.presto.sql.tree.Prepare;
-import com.facebook.presto.sql.tree.Query;
-import com.facebook.presto.sql.tree.RenameColumn;
-import com.facebook.presto.sql.tree.RenameSchema;
-import com.facebook.presto.sql.tree.RenameTable;
-import com.facebook.presto.sql.tree.ResetSession;
-import com.facebook.presto.sql.tree.Revoke;
-import com.facebook.presto.sql.tree.Rollback;
-import com.facebook.presto.sql.tree.SetPath;
-import com.facebook.presto.sql.tree.SetSession;
-import com.facebook.presto.sql.tree.ShowCatalogs;
-import com.facebook.presto.sql.tree.ShowColumns;
-import com.facebook.presto.sql.tree.ShowCreate;
-import com.facebook.presto.sql.tree.ShowFunctions;
-import com.facebook.presto.sql.tree.ShowGrants;
-import com.facebook.presto.sql.tree.ShowPartitions;
-import com.facebook.presto.sql.tree.ShowSchemas;
-import com.facebook.presto.sql.tree.ShowSession;
-import com.facebook.presto.sql.tree.ShowStats;
-import com.facebook.presto.sql.tree.ShowTables;
-import com.facebook.presto.sql.tree.StartTransaction;
-import com.facebook.presto.sql.tree.Statement;
-import com.facebook.presto.sql.tree.Use;
+import com.facebook.presto.sql.tree.*;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
@@ -78,6 +38,7 @@ public class StatementUtils
         builder.put(Delete.class, QueryType.DELETE);
 
         builder.put(ShowCatalogs.class, QueryType.DESCRIBE);
+        builder.put(ShowModels.class, QueryType.DESCRIBE);
         builder.put(ShowCreate.class, QueryType.DESCRIBE);
         builder.put(ShowFunctions.class, QueryType.DESCRIBE);
         builder.put(ShowGrants.class, QueryType.DESCRIBE);
@@ -96,6 +57,8 @@ public class StatementUtils
         builder.put(AddColumn.class, QueryType.DATA_DEFINITION);
         builder.put(CreateTable.class, QueryType.DATA_DEFINITION);
         builder.put(RenameTable.class, QueryType.DATA_DEFINITION);
+        builder.put(CreateModel.class, QueryType.DATA_DEFINITION);
+        builder.put(DeleteModel.class, QueryType.DATA_DEFINITION);
         builder.put(RenameColumn.class, QueryType.DATA_DEFINITION);
         builder.put(DropColumn.class, QueryType.DATA_DEFINITION);
         builder.put(DropTable.class, QueryType.DATA_DEFINITION);

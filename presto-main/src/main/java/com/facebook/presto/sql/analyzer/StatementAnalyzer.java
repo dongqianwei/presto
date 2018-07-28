@@ -41,83 +41,7 @@ import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.planner.ExpressionInterpreter;
 import com.facebook.presto.sql.planner.SymbolsExtractor;
 import com.facebook.presto.sql.planner.TypeProvider;
-import com.facebook.presto.sql.tree.AddColumn;
-import com.facebook.presto.sql.tree.AliasedRelation;
-import com.facebook.presto.sql.tree.AllColumns;
-import com.facebook.presto.sql.tree.Call;
-import com.facebook.presto.sql.tree.Commit;
-import com.facebook.presto.sql.tree.CreateSchema;
-import com.facebook.presto.sql.tree.CreateTable;
-import com.facebook.presto.sql.tree.CreateTableAsSelect;
-import com.facebook.presto.sql.tree.CreateView;
-import com.facebook.presto.sql.tree.Cube;
-import com.facebook.presto.sql.tree.Deallocate;
-import com.facebook.presto.sql.tree.DefaultTraversalVisitor;
-import com.facebook.presto.sql.tree.Delete;
-import com.facebook.presto.sql.tree.DereferenceExpression;
-import com.facebook.presto.sql.tree.DropColumn;
-import com.facebook.presto.sql.tree.DropSchema;
-import com.facebook.presto.sql.tree.DropTable;
-import com.facebook.presto.sql.tree.DropView;
-import com.facebook.presto.sql.tree.Except;
-import com.facebook.presto.sql.tree.Execute;
-import com.facebook.presto.sql.tree.Explain;
-import com.facebook.presto.sql.tree.ExplainType;
-import com.facebook.presto.sql.tree.Expression;
-import com.facebook.presto.sql.tree.ExpressionRewriter;
-import com.facebook.presto.sql.tree.ExpressionTreeRewriter;
-import com.facebook.presto.sql.tree.FieldReference;
-import com.facebook.presto.sql.tree.FrameBound;
-import com.facebook.presto.sql.tree.FunctionCall;
-import com.facebook.presto.sql.tree.Grant;
-import com.facebook.presto.sql.tree.GroupBy;
-import com.facebook.presto.sql.tree.GroupingElement;
-import com.facebook.presto.sql.tree.GroupingOperation;
-import com.facebook.presto.sql.tree.Identifier;
-import com.facebook.presto.sql.tree.Insert;
-import com.facebook.presto.sql.tree.Intersect;
-import com.facebook.presto.sql.tree.Join;
-import com.facebook.presto.sql.tree.JoinCriteria;
-import com.facebook.presto.sql.tree.JoinOn;
-import com.facebook.presto.sql.tree.JoinUsing;
-import com.facebook.presto.sql.tree.Lateral;
-import com.facebook.presto.sql.tree.LongLiteral;
-import com.facebook.presto.sql.tree.NaturalJoin;
-import com.facebook.presto.sql.tree.Node;
-import com.facebook.presto.sql.tree.NodeRef;
-import com.facebook.presto.sql.tree.OrderBy;
-import com.facebook.presto.sql.tree.Prepare;
-import com.facebook.presto.sql.tree.Property;
-import com.facebook.presto.sql.tree.QualifiedName;
-import com.facebook.presto.sql.tree.Query;
-import com.facebook.presto.sql.tree.QuerySpecification;
-import com.facebook.presto.sql.tree.Relation;
-import com.facebook.presto.sql.tree.RenameColumn;
-import com.facebook.presto.sql.tree.RenameSchema;
-import com.facebook.presto.sql.tree.RenameTable;
-import com.facebook.presto.sql.tree.ResetSession;
-import com.facebook.presto.sql.tree.Revoke;
-import com.facebook.presto.sql.tree.Rollback;
-import com.facebook.presto.sql.tree.Rollup;
-import com.facebook.presto.sql.tree.Row;
-import com.facebook.presto.sql.tree.SampledRelation;
-import com.facebook.presto.sql.tree.Select;
-import com.facebook.presto.sql.tree.SelectItem;
-import com.facebook.presto.sql.tree.SetOperation;
-import com.facebook.presto.sql.tree.SetSession;
-import com.facebook.presto.sql.tree.SingleColumn;
-import com.facebook.presto.sql.tree.SortItem;
-import com.facebook.presto.sql.tree.StartTransaction;
-import com.facebook.presto.sql.tree.Statement;
-import com.facebook.presto.sql.tree.Table;
-import com.facebook.presto.sql.tree.TableSubquery;
-import com.facebook.presto.sql.tree.Unnest;
-import com.facebook.presto.sql.tree.Use;
-import com.facebook.presto.sql.tree.Values;
-import com.facebook.presto.sql.tree.Window;
-import com.facebook.presto.sql.tree.WindowFrame;
-import com.facebook.presto.sql.tree.With;
-import com.facebook.presto.sql.tree.WithQuery;
+import com.facebook.presto.sql.tree.*;
 import com.facebook.presto.sql.util.AstUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -487,6 +411,21 @@ class StatementAnalyzer
         protected Scope visitCreateSchema(CreateSchema node, Optional<Scope> scope)
         {
             validateProperties(node.getProperties(), scope);
+            return createAndAssignScope(node, scope);
+        }
+
+        @Override
+        protected Scope visitCreateModel(CreateModel node, Optional<Scope> scope) {
+            return createAndAssignScope(node, scope);
+        }
+
+        @Override
+        protected Scope visitShowModels(ShowModels node, Optional<Scope> scope) {
+            return createAndAssignScope(node, scope);
+        }
+
+        @Override
+        protected Scope visitDeleteModel(DeleteModel node, Optional<Scope> scope) {
             return createAndAssignScope(node, scope);
         }
 

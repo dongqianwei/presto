@@ -434,4 +434,17 @@ public interface ConnectorMetadata
     {
         return emptyList();
     }
+
+    default void createModel(ConnectorSession toConnectorSession, String modelName)
+    {
+        throw new PrestoException(NOT_SUPPORTED, "This connector does not support create Model");
+    }
+
+    default List<String> listModels(ConnectorSession toConnectorSession) {
+        throw new PrestoException(NOT_SUPPORTED, "This connector does not support list Models");
+    }
+
+    default void deleteModel(ConnectorSession toConnectorSession, String modelName) {
+        throw new PrestoException(NOT_SUPPORTED, "This connector does not support list Models");
+    }
 }

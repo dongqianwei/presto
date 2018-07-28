@@ -58,6 +58,12 @@ public final class MetadataListing
         return ImmutableSortedSet.copyOf(accessControl.filterSchemas(session.getRequiredTransactionId(), session.getIdentity(), catalogName, schemaNames));
     }
 
+    public static SortedSet<String> listModels(Session session, Metadata metadata, AccessControl accessControl, String catalogName)
+    {
+        Set<String> schemaNames = ImmutableSet.copyOf(metadata.listModels(session, catalogName));
+        return ImmutableSortedSet.copyOf(schemaNames);
+    }
+
     public static Set<SchemaTableName> listTables(Session session, Metadata metadata, AccessControl accessControl, QualifiedTablePrefix prefix)
     {
         Set<SchemaTableName> tableNames = metadata.listTables(session, prefix).stream()

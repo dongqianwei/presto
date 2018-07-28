@@ -127,6 +127,21 @@ public abstract class AstVisitor<R, C>
         return visitStatement(node, context);
     }
 
+    protected R visitCreateModel(CreateModel node, C context)
+    {
+        return visitStatement(node, context);
+    }
+
+    protected R visitShowModels(ShowModels node, C context)
+    {
+        return visitStatement(node, context);
+    }
+
+    protected R visitDeleteModel(DeleteModel node, C context)
+    {
+        return visitStatement(node, context);
+    }
+
     protected R visitShowSchemas(ShowSchemas node, C context)
     {
         return visitStatement(node, context);

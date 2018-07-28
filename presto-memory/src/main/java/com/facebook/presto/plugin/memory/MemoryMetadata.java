@@ -44,13 +44,7 @@ import io.airlift.slice.Slice;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Inject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -76,6 +70,7 @@ public class MemoryMetadata
     private final NodeManager nodeManager;
     private final String connectorId;
     private final List<String> schemas = new ArrayList<>();
+    private final List<String> models = new ArrayList<>();
     private final AtomicLong nextTableId = new AtomicLong();
     private final Map<SchemaTableName, Long> tableIds = new HashMap<>();
     private final Map<Long, MemoryTableHandle> tables = new HashMap<>();
@@ -364,5 +359,26 @@ public class MemoryMetadata
                 Optional.empty(),
                 Optional.empty(),
                 ImmutableList.of());
+    }
+
+    @Override
+    public synchronized void createModel(ConnectorSession toConnectorSession, String modelName) {
+        if (models.contains(modelName)) {
+            throw new PrestoException(ALREADY_EXISTS, "Model already exists: " + modelName);
+        }
+        models.add(modelName);
+    }
+
+    @Override
+    public List<String> listModels(ConnectorSession toConnectorSession) {
+        return models;
+    }
+
+    @Override
+    public void deleteModel(ConnectorSession toConnectorSession, String modelName) {
+        if (!models.contains(modelName)) {
+            throw new PrestoException(NOT_FOUND, "Model not found: " + modelName);
+        }
+        models.remove(modelName);
     }
 }

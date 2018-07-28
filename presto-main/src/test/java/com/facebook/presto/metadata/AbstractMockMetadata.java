@@ -121,6 +121,16 @@ public abstract class AbstractMockMetadata
     }
 
     @Override
+    public void createModel(Session session, String catalogName, String modelName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> listModels(Session session, String catalogName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public TableMetadata getTableMetadata(Session session, TableHandle tableHandle)
     {
         throw new UnsupportedOperationException();
@@ -399,6 +409,11 @@ public abstract class AbstractMockMetadata
     @Override
     public void dropColumn(Session session, TableHandle tableHandle, ColumnHandle column)
     {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteModel(Session session, String catalogName, String modelName) {
         throw new UnsupportedOperationException();
     }
 
