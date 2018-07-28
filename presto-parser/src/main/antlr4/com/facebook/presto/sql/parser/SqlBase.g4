@@ -52,6 +52,9 @@ statement
         DROP COLUMN column=qualifiedName                               #dropColumn
     | ALTER TABLE tableName=qualifiedName
         ADD COLUMN column=columnDefinition                             #addColumn
+    | CREATE MODEL qualifiedName                                       #createModel
+    | SHOW MODELS ((FROM | IN) identifier)?                            #showModels
+    | DELETE MODEL qualifiedName                                       #deleteModel
     | CREATE (OR REPLACE)? VIEW qualifiedName AS query                 #createView
     | DROP VIEW (IF EXISTS)? qualifiedName                             #dropView
     | CALL qualifiedName '(' (callArgument (',' callArgument)*)? ')'   #call
@@ -573,6 +576,8 @@ LOCALTIMESTAMP: 'LOCALTIMESTAMP';
 LOGICAL: 'LOGICAL';
 MAP: 'MAP';
 MINUTE: 'MINUTE';
+MODEL: 'MODEL';
+MODELS: 'MODELS';
 MONTH: 'MONTH';
 NATURAL: 'NATURAL';
 NFC : 'NFC';

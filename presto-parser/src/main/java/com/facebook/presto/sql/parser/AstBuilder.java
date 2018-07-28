@@ -225,6 +225,24 @@ class AstBuilder
     }
 
     @Override
+    public Node visitCreateModel(SqlBaseParser.CreateModelContext ctx)
+    {
+        return super.visitCreateModel(ctx);
+    }
+
+    @Override
+    public Node visitShowModels(SqlBaseParser.ShowModelsContext ctx)
+    {
+        return super.visitShowModels(ctx);
+    }
+
+    @Override
+    public Node visitDeleteModel(SqlBaseParser.DeleteModelContext ctx)
+    {
+        return super.visitDeleteModel(ctx);
+    }
+
+    @Override
     public Node visitDropSchema(SqlBaseParser.DropSchemaContext context)
     {
         return new DropSchema(
