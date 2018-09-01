@@ -39,7 +39,7 @@ import static com.facebook.presto.spi.type.BigintType.BIGINT;
 import static com.facebook.presto.spi.type.BooleanType.BOOLEAN;
 import static com.facebook.presto.spi.type.VarcharType.VARCHAR;
 import static com.facebook.presto.sql.analyzer.FeaturesConfig.JoinDistributionType.BROADCAST;
-import static com.facebook.presto.sql.analyzer.FeaturesConfig.JoinDistributionType.REPARTITIONED;
+import static com.facebook.presto.sql.analyzer.FeaturesConfig.JoinDistributionType.PARTITIONED;
 import static com.facebook.presto.sql.analyzer.FeaturesConfig.JoinReorderingStrategy.ELIMINATE_CROSS_JOINS;
 import static com.facebook.presto.sql.analyzer.FeaturesConfig.JoinReorderingStrategy.NONE;
 import static com.google.common.base.Preconditions.checkArgument;
@@ -65,6 +65,7 @@ public final class SystemSessionProperties
     public static final String QUERY_MAX_RUN_TIME = "query_max_run_time";
     public static final String RESOURCE_OVERCOMMIT = "resource_overcommit";
     public static final String QUERY_MAX_CPU_TIME = "query_max_cpu_time";
+    public static final String QUERY_MAX_STAGE_COUNT = "query_max_stage_count";
     public static final String REDISTRIBUTE_WRITES = "redistribute_writes";
     public static final String SCALE_WRITERS = "scale_writers";
     public static final String WRITER_MIN_SIZE = "writer_min_size";
@@ -90,7 +91,6 @@ public final class SystemSessionProperties
     public static final String LEGACY_ROW_FIELD_ORDINAL_ACCESS = "legacy_row_field_ordinal_access";
     public static final String ITERATIVE_OPTIMIZER = "iterative_optimizer_enabled";
     public static final String ITERATIVE_OPTIMIZER_TIMEOUT = "iterative_optimizer_timeout";
-    public static final String ENABLE_NEW_STATS_CALCULATOR = "enable_new_stats_calculator";
     public static final String EXCHANGE_COMPRESSION = "exchange_compression";
     public static final String LEGACY_TIMESTAMP = "legacy_timestamp";
     public static final String ENABLE_INTERMEDIATE_AGGREGATIONS = "enable_intermediate_aggregations";
@@ -265,6 +265,11 @@ public final class SystemSessionProperties
                         "Use resources which are not guaranteed to be available to the query",
                         false,
                         false),
+                integerProperty(
+                        QUERY_MAX_STAGE_COUNT,
+                        "Temporary: Maximum number of stages a query can have",
+                        queryManagerConfig.getMaxStageCount(),
+                        true),
                 booleanProperty(
                         DICTIONARY_AGGREGATION,
                         "Enable optimization for aggregations on dictionaries",
@@ -407,11 +412,6 @@ public final class SystemSessionProperties
                         value -> Duration.valueOf((String) value),
                         Duration::toString),
                 booleanProperty(
-                        ENABLE_NEW_STATS_CALCULATOR,
-                        "Use new experimental statistics calculator",
-                        featuresConfig.isEnableNewStatsCalculator(),
-                        true),
-                booleanProperty(
                         EXCHANGE_COMPRESSION,
                         "Enable compression in exchanges",
                         featuresConfig.isExchangeCompressionEnabled(),
@@ -510,7 +510,7 @@ public final class SystemSessionProperties
             if (!distributedJoin) {
                 return BROADCAST;
             }
-            return REPARTITIONED;
+            return PARTITIONED;
         }
 
         return session.getSystemProperty(JOIN_DISTRIBUTION_TYPE, JoinDistributionType.class);
@@ -604,6 +604,11 @@ public final class SystemSessionProperties
     public static boolean resourceOvercommit(Session session)
     {
         return session.getSystemProperty(RESOURCE_OVERCOMMIT, Boolean.class);
+    }
+
+    public static int getQueryMaxStageCount(Session session)
+    {
+        return session.getSystemProperty(QUERY_MAX_STAGE_COUNT, Integer.class);
     }
 
     public static boolean planWithTableNodePartitioning(Session session)
@@ -719,11 +724,6 @@ public final class SystemSessionProperties
     public static Duration getOptimizerTimeout(Session session)
     {
         return session.getSystemProperty(ITERATIVE_OPTIMIZER_TIMEOUT, Duration.class);
-    }
-
-    public static boolean isEnableNewStatsCalculator(Session session)
-    {
-        return session.getSystemProperty(ENABLE_NEW_STATS_CALCULATOR, Boolean.class);
     }
 
     public static boolean isExchangeCompressionEnabled(Session session)
